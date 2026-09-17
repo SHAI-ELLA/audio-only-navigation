@@ -1,0 +1,28 @@
+ a0d292ec311b97fefd21e93cdefb60f88d19ede6 docs/m.css (a0d292e)
+ 8f0c6b04b2257a520aaab38421b2e090204b69df src/deps/assimp (8f0c6b0)
+ e306b274f1885f32b7e9d65062aa942b398805c2 src/deps/bullet3 (e306b27)
+ 3b94a1f970694a9f26860f60d58307d8cc2487f7 src/deps/corrade (3b94a1f)
+ 65568a98fa48de0369f35e9788779fdfbe14cacc src/deps/corrade/toolchains (65568a9)
+ 3147391d946bb4b6c68edd901f2add6ac1f31f8c src/deps/eigen (3147391)
+ 0a49ef0a00baa3ab520ddc452f0e3b1e099c5589 src/deps/glfw (0a49ef0)
+ 9418dcb69355558f70de260483424412c5ca2fce src/deps/imgui (9418dcb)
+ eb382b3096666f320b59f4b098643a4203ccaafa src/deps/magnum (eb382b3)
+ 65568a98fa48de0369f35e9788779fdfbe14cacc src/deps/magnum/toolchains (65568a9)
+ 62a07c38bc32b04329c457237c813abf5d345c97 src/deps/magnum-bindings (62a07c3)
+ c6c759def2090a821a97763fc2e15ec06d0396ce src/deps/magnum-integration (c6c759d)
+ 65568a98fa48de0369f35e9788779fdfbe14cacc src/deps/magnum-integration/toolchains (65568a9)
+ e9f99228aa0f2d2c481f64f2d6f474d5ce05fce5 src/deps/magnum-plugins (e9f9922)
+ 65568a98fa48de0369f35e9788779fdfbe14cacc src/deps/magnum-plugins/toolchains (65568a9)
+ 44d2d0eaf289f54d4f86f45f4b6b68fac2d15f0e src/deps/openexr (44d2d0e)
+ aa304c9c7d725ffb9d10af08a3b34cb372307020 src/deps/pybind11 (aa304c9)
+ 73063f5002612c6bf64fe24f851cd5cc0d83eef9 src/deps/rapidjson (73063f5)
+ 0a439623f75c029912728d80cb7f1b8b48739ca4 src/deps/rapidjson/thirdparty/gtest (0a43962)
+ 8eef00be6003a6bf9c49cb4c126662e05e58d508 src/deps/recastnavigation (heads/master)
+ 4fd446b4abb5c71fb7a232a083bbddd65f25fc6f src/deps/rlr-audio-propagation (heads/main)
+ e52dfdbecdf8893b161a65e508bc009746fa6042 src/deps/tinyobjloader (e52dfdb)
+ 9dac85a7732e13b1018dcd7b9e24a67712b7ca8f src/deps/v-hacd (heads/master)
+ 8c82db684aac12483ae80e5bd1b9a68450e8aff0 src/deps/v-hacd/v-hacd-data (heads/master)
+Top-level external repositories (recorded from the working checkouts):
+habitat-sim  https://github.com/facebookresearch/habitat-sim.git  RLRAudioPropagationUpdate  4f61e321477708fa606fbd8f42b4bef41d67c672  local patch: Corrade <cstdint>
+habitat-lab  https://github.com/facebookresearch/habitat-lab.git  v0.2.2  0f454f62e41050bc90ca468c62db35d7484923ff  local patch: remove FetchRobot import
+sound-spaces  https://github.com/facebookresearch/sound-spaces.git  main  287184fd7067a0385558492716355c54875500ee  local patch: defer get_task_config import

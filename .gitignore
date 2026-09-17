@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+build/
+dist/
+*.egg-info/
+# Large experiment data and generated outputs (persistent data belongs in
+# ~/data/audio-only-navigation/, outside this repository).
+/data/
+/datasets/
+/assets/
+/outputs/
+/third_party/
+*.wav
+*.npy
+*.npz
+*.glb
+*.ply
+*.navmesh
