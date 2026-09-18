@@ -8,3 +8,5 @@ This repository contains project source code, configs, scripts and documentation
 External Habitat-Sim, Habitat-Lab and SoundSpaces checkouts live under
 `~/third_party/`. Large scenes, audio, generated outputs and experiment data
 belong under `~/data/audio-only-navigation/` and are excluded from Git.
+
+The first interactive task is specified in [docs/game_spec.md](docs/game_spec.md).

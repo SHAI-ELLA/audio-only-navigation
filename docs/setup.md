@@ -136,6 +136,8 @@ It reconstructs a navigation mesh and
 chooses two connected floor positions 1–3 meters apart, then places the listener
 and source 1.5 meters above them. Audio is mono at 16 kHz with indirect propagation
 enabled and default acoustic materials (the asset has no semantic annotations).
+That standalone installation smoke test remains mono; the Milestone 1 navigation
+environment configures the same audio sensor as two-channel binaural output.
 
 The test rejects missing geometry/navigation, invalid positions, empty or malformed
 audio, nonfinite values, all-zero responses, and a failed float-WAV round trip.
