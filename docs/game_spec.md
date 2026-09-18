@@ -29,7 +29,8 @@ The distinction is explicit in the implementation:
   position and orientation, fixed source position, scene, navmesh and geodesic
   path calculations.
 - Agent observation is a dictionary with exactly one key, `audio`. Its value is
-  the raw finite, non-empty mono impulse response as a NumPy array. It contains
+  the raw finite, non-empty two-channel binaural impulse response as a NumPy
+  array. It contains
   no coordinates, distance, map, GPS, compass, RGB or depth.
 - Debug/info/metrics are returned separately in `info`. They include positions,
   yaw and geodesic distance so a human can inspect an episode. They are not part
@@ -43,8 +44,10 @@ at 16×16 resolution, but never returns its value.
 
 The action is one of:
 
-- `MOVE_FORWARD`: attempt to move forward by `move_distance` meters. A move
-  into a non-navigable location leaves the pose unchanged.
+- `MOVE_FORWARD`: attempt to move forward by `move_distance` meters. Habitat-Sim
+  filters the whole attempted segment through the navmesh (`PathFinder.try_step`),
+  so the action cannot cross non-navigable geometry. A blocked move leaves the
+  pose unchanged.
 - `TURN_LEFT`: rotate counter-clockwise by `turn_angle_degrees`.
 - `TURN_RIGHT`: rotate clockwise by `turn_angle_degrees`.
 - `STOP`: end the episode immediately.
@@ -57,8 +60,11 @@ control.
 
 `reset()` samples a navigable start and a different connected navigable source
 point in the bundled room, initializes the agent orientation, fixes the source,
-and returns the first audio observation. Every non-terminal action updates the
-pose if needed and produces a fresh audio observation.
+and returns the first audio observation. The environment seeds the pathfinder
+once at construction; successive resets advance its random sequence, while
+equivalent environments with the same seed reproduce that sequence. Every
+non-terminal action updates the pose if needed and produces a fresh audio
+observation.
 
 `STOP` succeeds when the internally computed geodesic distance to the source is
 at most `success_distance` (default 1.0 meter). A successful STOP returns reward
@@ -68,6 +74,10 @@ step has the configurable `step_penalty` (default `-0.01`). Reaching
 sound-intensity reward or geodesic reward shaping in this milestone.
 
 ## Deliberate scope limits
+
+The current audio value is a two-channel binaural acoustic impulse response, not a microphone-like
+source waveform. Source-audio convolution is deliberately deferred to a later
+design step.
 
 This is an environment smoke test, not an agent or dataset pipeline. It does
 not include PPO, reinforcement-learning training, neural networks, CL1,

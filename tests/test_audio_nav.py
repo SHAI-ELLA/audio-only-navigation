@@ -27,7 +27,7 @@ class AudioNavEnvTests(unittest.TestCase):
     def test_observation_is_audio_only_and_valid(self):
         observation = self.env.reset()
         self.assertEqual(set(observation), {"audio"})
-        self.assertEqual(observation["audio"].shape[0], 1)
+        self.assertEqual(observation["audio"].shape[0], 2)
         self.assertGreater(observation["audio"].shape[1], 0)
         self.assertTrue(np.isfinite(observation["audio"]).all())
 
@@ -37,6 +37,35 @@ class AudioNavEnvTests(unittest.TestCase):
         self.env.step(Actions.TURN_LEFT)
         self.assertNotEqual(self.env.agent_yaw, yaw)
         self.assertTrue(np.array_equal(source, self.env.source_position))
+
+    def test_resets_advance_but_equivalent_envs_reproduce(self):
+        first = AudioNavEnv(AudioNavConfig(max_steps=3, move_distance=0.1))
+        try:
+            first.reset()
+            first_agent = first.agent_position.copy()
+            first_source = first.source_position.copy()
+            first.reset()
+            second_agent = first.agent_position.copy()
+            second_source = first.source_position.copy()
+            self.assertFalse(np.array_equal(first_agent, second_agent))
+            self.assertFalse(np.array_equal(first_source, second_source))
+
+        finally:
+            first.close()
+
+        # Habitat-Sim's pinned seed() wraps process-global rand(); construct
+        # the equivalent environment after the first one has finished so the
+        # one-time seed reproduces the same sequence without reseeding resets.
+        other = AudioNavEnv(AudioNavConfig(max_steps=3, move_distance=0.1))
+        try:
+            other.reset()
+            self.assertTrue(np.array_equal(first_agent, other.agent_position))
+            self.assertTrue(np.array_equal(first_source, other.source_position))
+            other.reset()
+            self.assertTrue(np.array_equal(second_agent, other.agent_position))
+            self.assertTrue(np.array_equal(second_source, other.source_position))
+        finally:
+            other.close()
 
     def test_forward_changes_position_when_possible(self):
         before = self.env.agent_position.copy()

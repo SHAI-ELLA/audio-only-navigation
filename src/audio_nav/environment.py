@@ -77,7 +77,9 @@ class AudioNavEnv:
         if not self.sim.recompute_navmesh(self.sim.pathfinder, settings):
             self.sim.close()
             raise RuntimeError("Could not build a navigation mesh")
-        self._rng = np.random.RandomState(self.config.random_seed)
+        # Seed once per environment. Pathfinder RNG state then advances across
+        # reset() calls, while equivalent environments reproduce the sequence.
+        self.sim.pathfinder.seed(self.config.random_seed)
         self._audio_spec = habitat_sim.AudioSensorSpec()
         # Habitat-Sim 0.2.2's audio binding looks up this historical UUID
         # internally, so the policy-facing key is mapped separately below.
@@ -85,9 +87,9 @@ class AudioNavEnv:
         self._audio_spec.enableMaterials = False
         self._audio_spec.position = [0.0, 1.5, 0.0]
         self._audio_spec.channelLayout.type = (
-            habitat_sim.sensor.RLRAudioPropagationChannelLayoutType.Mono
+            habitat_sim.sensor.RLRAudioPropagationChannelLayoutType.Binaural
         )
-        self._audio_spec.channelLayout.channelCount = 1
+        self._audio_spec.channelLayout.channelCount = 2
         self._audio_spec.acousticsConfig.sampleRate = self.config.audio_sample_rate
         self._audio_spec.acousticsConfig.indirect = True
         self.sim.add_sensor(self._audio_spec)
@@ -131,8 +133,9 @@ class AudioNavEnv:
             elif action == Actions.MOVE_FORWARD:
                 direction = np.array([np.sin(self._yaw), 0.0, -np.cos(self._yaw)])
                 candidate = self._agent_floor + self.config.move_distance * direction
-                if self.sim.pathfinder.is_navigable(candidate):
-                    self._agent_floor = candidate
+                filtered = np.asarray(self.sim.pathfinder.try_step(self._agent_floor, candidate))
+                if not np.array_equal(filtered, self._agent_floor):
+                    self._agent_floor = filtered
                     self._set_pose(self._agent_floor, self._yaw)
             reward = self.config.step_penalty
             if self._steps >= self.config.max_steps:
@@ -170,7 +173,6 @@ class AudioNavEnv:
             self.sim = None
 
     def _sample_episode_points(self) -> Tuple[np.ndarray, np.ndarray]:
-        self.sim.pathfinder.seed(self.config.random_seed)
         start = np.asarray(self.sim.pathfinder.get_random_navigable_point())
         for _ in range(100):
             candidate = np.asarray(self.sim.pathfinder.get_random_navigable_point())
@@ -195,7 +197,7 @@ class AudioNavEnv:
         sensor = self.sim.get_agent(0)._sensors[self._audio_spec.uuid]
         sensor.setAudioSourceTransform(source)
         audio = np.asarray(self.sim.get_sensor_observations()[self._audio_spec.uuid], dtype=np.float32)
-        if audio.ndim != 2 or audio.shape[0] != 1 or audio.shape[1] == 0:
+        if audio.ndim != 2 or audio.shape[0] != 2 or audio.shape[1] == 0:
             raise RuntimeError(f"Invalid audio observation shape: {audio.shape}")
         if not np.isfinite(audio).all() or not np.any(audio != 0):
             raise RuntimeError("Audio observation must be finite and non-empty")
