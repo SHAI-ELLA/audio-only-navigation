@@ -131,7 +131,7 @@ class AudioNavEnv:
                 self._yaw -= np.deg2rad(self.config.turn_angle_degrees)
                 self._set_pose(self._agent_floor, self._yaw)
             elif action == Actions.MOVE_FORWARD:
-                direction = np.array([np.sin(self._yaw), 0.0, -np.cos(self._yaw)])
+                direction = self._forward_direction()
                 candidate = self._agent_floor + self.config.move_distance * direction
                 filtered = np.asarray(self.sim.pathfinder.try_step(self._agent_floor, candidate))
                 if not np.array_equal(filtered, self._agent_floor):
@@ -190,7 +190,15 @@ class AudioNavEnv:
         self.sim.get_agent(0).set_state(state, True)
 
     def _rotation_for_yaw(self, yaw: float):
-        return habitat_sim.utils.common.quat_from_angle_axis(yaw, np.array([0.0, 1.0, 0.0]))
+        return habitat_sim.utils.common.quat_from_angle_axis(yaw, habitat_sim.geo.UP)
+
+    def _forward_direction(self) -> np.ndarray:
+        """Return the world-space direction of the agent's local FRONT (-Z)."""
+        rotation = self._rotation_for_yaw(self._yaw)
+        return np.asarray(
+            habitat_sim.utils.common.quat_rotate_vector(rotation, habitat_sim.geo.FRONT),
+            dtype=np.float32,
+        )
 
     def _observe_audio(self) -> np.ndarray:
         source = self._source_floor + np.array([0.0, 1.5, 0.0])

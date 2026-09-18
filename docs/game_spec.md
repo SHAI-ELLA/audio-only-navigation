@@ -46,8 +46,8 @@ The action is one of:
 
 - `MOVE_FORWARD`: attempt to move forward by `move_distance` meters. Habitat-Sim
   filters the whole attempted segment through the navmesh (`PathFinder.try_step`),
-  so the action cannot cross non-navigable geometry. A blocked move leaves the
-  pose unchanged.
+  so the action cannot cross non-navigable geometry. The returned position may
+  be clipped or slide along collision geometry according to that API.
 - `TURN_LEFT`: rotate counter-clockwise by `turn_angle_degrees`.
 - `TURN_RIGHT`: rotate clockwise by `turn_angle_degrees`.
 - `STOP`: end the episode immediately.

@@ -8,6 +8,8 @@ os.environ.setdefault("NUMBA_CACHE_DIR", "/tmp/numba-cache")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import numpy as np
+import quaternion  # noqa: F401
+import habitat_sim
 
 from audio_nav import Actions, AudioNavConfig, AudioNavEnv
 
@@ -37,6 +39,17 @@ class AudioNavEnvTests(unittest.TestCase):
         self.env.step(Actions.TURN_LEFT)
         self.assertNotEqual(self.env.agent_yaw, yaw)
         self.assertTrue(np.array_equal(source, self.env.source_position))
+
+    def test_forward_uses_habitat_rotation_convention(self):
+        self.env._yaw = np.pi / 2.0
+        expected = np.asarray(
+            habitat_sim.utils.common.quat_rotate_vector(
+                self.env._rotation_for_yaw(self.env.agent_yaw), habitat_sim.geo.FRONT
+            )
+        )
+        np.testing.assert_allclose(self.env._forward_direction(), expected)
+        # Positive Habitat yaw is a left turn: local -Z becomes world -X.
+        np.testing.assert_allclose(self.env._forward_direction(), [-1.0, 0.0, 0.0], atol=1e-6)
 
     def test_resets_advance_but_equivalent_envs_reproduce(self):
         first = AudioNavEnv(AudioNavConfig(max_steps=3, move_distance=0.1))
